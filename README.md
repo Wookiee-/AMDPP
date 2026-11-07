@@ -1,6 +1,6 @@
 # AMDPP
 
-A small system tray app for Fedora KDE that switches the power profile and the AMD energy performance preference (EPP) on Ryzen CPUs using `amd-pstate-epp`.
+A small system tray app that switches the power profile and the AMD energy performance preference (EPP) on Ryzen CPUs using `amd-pstate-epp`.
 
 ## Features
 
@@ -11,30 +11,39 @@ A small system tray app for Fedora KDE that switches the power profile and the A
 
 ## Requirements
 
-- Fedora with KDE Plasma (tested on Fedora 45).
 - An AMD CPU using `amd-pstate-epp`.
-- `tuned-ppd` (provides the `org.freedesktop.UPower.PowerProfiles` D-Bus API).
-- `python3-pyside6`, `sudo`.
+- A D-Bus power profiles service: `power-profiles-daemon` or `tuned-ppd`.
+- Python 3 with PySide6, and `sudo`.
 
 ## Installing
 
-Build the RPM from this repo:
+Packages are published on the [Releases](https://github.com/Wookiee-/AMDPP/releases) page:
 
-```sh
-mkdir -p ~/rpmbuild/SOURCES
-mkdir -p /tmp/amdpp-1.0 && cp -r power-tray amd.png set-epp packaging /tmp/amdpp-1.0/
-tar -C /tmp -czf ~/rpmbuild/SOURCES/amdpp-1.0.tar.gz amdpp-1.0
-rpmbuild -bb packaging/amdpp.spec
-sudo dnf install ~/rpmbuild/RPMS/noarch/amdpp-1.0-*.fc45.noarch.rpm
-```
+- **Fedora/RHEL:** `amdpp-<version>-1.noarch.rpm`
+- **Arch Linux:** `amdpp-<version>-1-any.pkg.tar.zst`
+- **Debian/Ubuntu:** `amdpp_<version>_all.deb`
 
-The package installs:
+Install with your package manager, for example `sudo dnf install ./amdpp-*.noarch.rpm` on Fedora.
+
+The packages install:
 
 - `/usr/bin/amdpp`: starts the tray app.
 - `/usr/share/amdpp/`: the app and its icon.
-- `/usr/libexec/set-epp`: root helper that writes the EPP value to every CPU.
-- `/etc/sudoers.d/amdpp`: lets members of the `wheel` group run only the helper without a password.
+- `/usr/lib/amdpp/set-epp`: root helper that writes the EPP value to every CPU.
+- `/etc/sudoers.d/amdpp`: lets members of the `wheel` or `sudo` group run only the helper without a password.
 - `/etc/xdg/autostart/amdpp.desktop`: starts the app at login.
+
+## Building
+
+From a checkout, build every package format at once:
+
+```sh
+./scripts/build-packages.sh
+```
+
+Or pick one or more formats: `--rpm`, `--arch`, `--deb`. The output goes to `dist/packages/`. Building the RPM needs `rpmbuild`, the Arch package needs `makepkg`, and the DEB needs `dpkg-deb`.
+
+Pushing a version tag such as `v1.0.0` runs the GitHub Actions workflow in `.github/workflows/build.yml`. It builds each format in its own container and publishes the packages to a GitHub release.
 
 ## Usage
 
@@ -45,13 +54,14 @@ Changing the profile also resets EPP to that profile's default, so set EPP after
 ## How it works
 
 - **Profile:** set through the `ActiveProfile` property of `org.freedesktop.UPower.PowerProfiles` on the system D-Bus. No root needed.
-- **EPP:** written to `/sys/devices/system/cpu/cpufreq/policy*/energy_performance_preference` by `/usr/libexec/set-epp`. The helper accepts only the five valid values and checks that the CPU supports the value. If the passwordless `sudo` call fails, the app falls back to `pkexec`, which asks for a password.
+- **EPP:** written to `/sys/devices/system/cpu/cpufreq/policy*/energy_performance_preference` by `/usr/lib/amdpp/set-epp`. The helper accepts only the five valid values and checks that the CPU supports the value. If the passwordless `sudo` call fails, the app falls back to `pkexec`, which asks for a password.
 - **Saved state:** the last profile and EPP are stored in `~/.config/power-tray/state.json`.
 
 ## Uninstalling
 
+Remove the package with your package manager (`sudo dnf remove amdpp`, `sudo pacman -R amdpp`, or `sudo apt remove amdpp`). To delete saved settings as well:
+
 ```sh
-sudo dnf remove amdpp
 rm -rf ~/.config/power-tray
 ```
 

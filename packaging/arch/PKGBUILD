@@ -1,0 +1,22 @@
+# Maintainer: Wookiee- <Wookiee-@users.noreply.github.com>
+pkgname=amdpp
+pkgver=1.0
+pkgrel=1
+pkgdesc="AMD power profile and energy preference tray control"
+arch=('any')
+url="https://github.com/Wookiee-/AMDPP"
+license=('MIT')
+depends=('python' 'pyside6' 'sudo' 'power-profiles-daemon')
+source=("$pkgname-$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+package() {
+  local src="$srcdir/$pkgname-$pkgver"
+
+  install -Dm0755 "$src/packaging/amdpp" "$pkgdir/usr/bin/amdpp"
+  install -Dm0644 "$src/power-tray/power_tray.py" "$pkgdir/usr/share/amdpp/power_tray.py"
+  install -Dm0644 "$src/power-tray/amd.png" "$pkgdir/usr/share/amdpp/amd.png"
+  install -Dm0755 "$src/packaging/set-epp" "$pkgdir/usr/lib/amdpp/set-epp"
+  install -Dm0440 "$src/packaging/amdpp.sudoers" "$pkgdir/etc/sudoers.d/amdpp"
+  install -Dm0644 "$src/packaging/amdpp.desktop" "$pkgdir/etc/xdg/autostart/amdpp.desktop"
+}

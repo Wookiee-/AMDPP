@@ -10,7 +10,7 @@ from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
 DBUS_DEST = "org.freedesktop.UPower.PowerProfiles"
 DBUS_PATH = "/org/freedesktop/UPower/PowerProfiles"
 EPP_FILE = "/sys/devices/system/cpu/cpufreq/policy0/energy_performance_preference"
-EPP_HELPER = "/usr/libexec/set-epp"
+EPP_HELPER = "/usr/lib/amdpp/set-epp"
 ICON_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "amd.png")
 STATE_FILE = os.path.join(os.path.expanduser("~"), ".config", "power-tray", "state.json")
 

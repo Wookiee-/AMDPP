@@ -1,1 +1,2 @@
-%wheel ALL=(root) NOPASSWD: /usr/libexec/set-epp
+%wheel ALL=(root) NOPASSWD: /usr/lib/amdpp/set-epp
+%sudo ALL=(root) NOPASSWD: /usr/lib/amdpp/set-epp
