@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=AMDPP
+Exec=amdpp
+Icon=preferences-system-power-management
+Terminal=false
+X-GNOME-Autostart-enabled=true

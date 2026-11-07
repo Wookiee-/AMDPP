@@ -1,0 +1,19 @@
+#!/bin/sh
+set -eu
+
+value="${1:-}"
+base=/sys/devices/system/cpu/cpufreq
+
+case "$value" in
+    default|performance|balance_performance|balance_power|power) ;;
+    *) echo "invalid EPP: $value" >&2; exit 2 ;;
+esac
+
+for policy in "$base"/policy*; do
+    avail="$policy/energy_performance_available_preferences"
+    grep -qw -- "$value" "$avail" || { echo "$value not supported by $policy" >&2; exit 3; }
+done
+
+for policy in "$base"/policy*; do
+    printf '%s' "$value" > "$policy/energy_performance_preference"
+done
